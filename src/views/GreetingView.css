@@ -1,0 +1,199 @@
+.greeting-intro-overlay {
+  position: relative;
+  z-index: 15;
+  width: 100%;
+  height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 3vw, 2rem);
+  overflow: hidden;
+}
+
+.intro-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+/* Speech Bubble synced with Misty Rose / Old Rose glass surface */
+.speech-bubble {
+  background: var(--surface-card);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 2.5px solid var(--accent-peach);
+  border-radius: 24px;
+  padding: clamp(1rem, 2.4vw, 1.35rem) clamp(1.2rem, 2.8vw, 1.65rem);
+  margin-bottom: 18px;
+  min-height: 86px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 14px 32px rgba(56, 24, 29, 0.16);
+  position: relative;
+  opacity: 0;
+  transform: translateY(12px) scale(0.95);
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s ease;
+}
+
+.speech-bubble.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.speech-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 12px 12px 0;
+  border-style: solid;
+  border-color: var(--accent-peach) transparent transparent;
+}
+
+.greeting-text {
+  font-size: clamp(1.05rem, 2vw, 1.22rem);
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--text-ink);
+}
+
+.typing-cursor {
+  display: inline-block;
+  margin-left: 2px;
+  color: var(--accent-peach-deep);
+  animation: blinkCursor 0.8s steps(2, start) infinite;
+}
+
+/* Robot walking from left side into center */
+.robot-wrapper {
+  transform: translateX(-120vw);
+  animation: walkToCenter 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.robot-img {
+  width: clamp(180px, 24vw, 225px);
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 18px 28px rgba(56, 24, 29, 0.22));
+  transform-origin: bottom center;
+  animation:
+    stepAndWave 0.45s ease-in-out 3,
+    idleFloat 3s ease-in-out 1.4s infinite;
+}
+
+/* Action Buttons */
+.intro-controls {
+  margin-top: 22px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(14px);
+  pointer-events: none;
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
+}
+
+.intro-controls.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.enter-home-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--accent-peach);
+  color: var(--active-icon-text);
+  border: 2px solid var(--accent-peach);
+  padding: 0.78rem 1.55rem;
+  font-size: 0.98rem;
+  font-weight: 700;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(198, 92, 106, 0.32);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.enter-home-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(198, 92, 106, 0.38);
+}
+
+.intro-icon-btn {
+  background: var(--surface-card);
+  backdrop-filter: blur(12px);
+  color: var(--text-ink);
+  border: 2px solid var(--border-peach);
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(56, 24, 29, 0.14);
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.intro-icon-btn:hover {
+  background: var(--bg-peach-soft);
+  transform: scale(1.08);
+}
+
+@keyframes walkToCenter {
+  0% {
+    transform: translateX(-120vw);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes stepAndWave {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-10px) rotate(-5deg);
+  }
+  75% {
+    transform: translateY(-10px) rotate(5deg);
+  }
+}
+
+@keyframes idleFloat {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(2.5deg);
+  }
+}
+
+@keyframes blinkCursor {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}

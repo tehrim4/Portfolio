@@ -1,0 +1,83 @@
+.social-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(0.6rem, 1.5vw, 1rem);
+  width: 100%;
+  z-index: 10;
+}
+
+.social-dock {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.4rem, 1vw, 0.75rem);
+  padding: clamp(0.38rem, 0.85vw, 0.5rem) clamp(0.7rem, 1.4vw, 0.95rem);
+  background: var(--surface-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-peach);
+  border-radius: 999px;
+  box-shadow: 0 10px 28px rgba(56, 24, 29, 0.16);
+}
+
+.social-link-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(2.25rem, 3.8vw, 2.65rem);
+  height: clamp(2.25rem, 3.8vw, 2.65rem);
+  border-radius: 50%;
+  border: 1px solid transparent;
+  color: var(--icon-color, var(--text-ink));
+  text-decoration: none;
+  transition:
+    transform 0.22s ease,
+    background-color 0.22s ease,
+    border-color 0.22s ease;
+}
+.social-link-btn svg {
+  width: clamp(1.05rem, 1.7vw, 1.25rem);
+  height: clamp(1.05rem, 1.7vw, 1.25rem);
+  transition: transform 0.22s ease;
+}
+
+.social-link-btn:hover,
+.social-link-btn:focus-visible {
+  background: var(--bg-peach-soft);
+  border-color: var(--border-peach);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.social-link-btn:hover svg {
+  transform: scale(1.12);
+}
+
+/* Upward tooltip so it never clips at the bottom edge of the screen */
+.social-link-btn::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  padding: 0.28rem 0.65rem;
+  border-radius: 8px;
+  background: var(--text-ink);
+  color: var(--bg-cream);
+  font-size: 0.74rem;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.social-link-btn:hover::after,
+.social-link-btn:focus-visible::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
