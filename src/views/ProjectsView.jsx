@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, ExternalLink, Eye, FolderGit2 } from "lucide-react";
 
 const PROJECTS = [
@@ -6,6 +6,8 @@ const PROJECTS = [
     id: "daymin-ai",
     title: "DayMin AI",
     subtitle: "AI-Powered Daily Planning Assistant",
+    summary:
+      "Turns daily tasks and priorities into structured plans using AI agents and persistent storage.",
     stack: ["Python", "PostgreSQL", "Strands Agents", "Ollama"],
     image: "/projects/dayMin-ai.png",
     liveUrl: "https://daymin-ai.vercel.app/",
@@ -17,6 +19,8 @@ const PROJECTS = [
     id: "wind-intelligence",
     title: "Wind Intelligence",
     subtitle: "Renewable Energy Forecasting",
+    summary:
+      "Compares forecasted vs. actual wind generation data from Elexon BMRS through a FastAPI backend.",
     stack: ["Python", "FastAPI", "Elexon BMRS API"],
     image: "/projects/wind-intelligence.png",
     liveUrl: "https://frontend-8tbr.vercel.app/",
@@ -28,6 +32,8 @@ const PROJECTS = [
     id: "ember-plate",
     title: "Ember Plate",
     subtitle: "Interactive Restaurant Experience",
+    summary:
+      "Interactive dining showcase pairing expressive visuals, smooth transitions, and responsive layouts.",
     stack: ["React", "JavaScript", "CSS"],
     image: "/projects/ember.png",
     liveUrl: "https://ember-plate-six.vercel.app/",
@@ -39,6 +45,8 @@ const PROJECTS = [
     id: "aura",
     title: "AURA",
     subtitle: "Creative Digital Experience",
+    summary:
+      "Editorial-inspired web experience focused on refined typography, balanced spacing, and fluid motion.",
     stack: ["React", "CSS", "Typography & UI"],
     image: "/projects/aura-hero.png",
     liveUrl: "https://aura-topaz-three.vercel.app/",
@@ -50,6 +58,8 @@ const PROJECTS = [
     id: "market-os",
     title: "Market OS",
     subtitle: "Dashboard Interface",
+    summary:
+      "Structured dashboard layout organizing dense information with clear hierarchy and modular components.",
     stack: ["React", "Component Architecture", "UI/UX"],
     image: "/projects/market-os.png",
     liveUrl: "https://market-os-chi.vercel.app/",
@@ -61,6 +71,8 @@ const PROJECTS = [
     id: "glow-skin",
     title: "Glow Skin",
     subtitle: "Beauty Brand Website",
+    summary:
+      "Clean beauty storefront concept combining soft visual storytelling, product highlights, and mobile polish.",
     stack: ["React", "CSS", "Responsive Design"],
     image: "/projects/glow.png",
     liveUrl: "https://glow-skin-beauty-studio-rojo.vercel.app/",
@@ -71,14 +83,17 @@ const PROJECTS = [
 ];
 
 function ProjectThumbnail({ src, title, large = false }) {
+  const [loaded, setLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
+
+  const height = large ? "190px" : "120px";
 
   if (imgError) {
     return (
       <div
         style={{
           width: "100%",
-          height: large ? "190px" : "120px",
+          height,
           borderRadius: "14px",
           background:
             "linear-gradient(135deg, var(--accent-peach), var(--bg-peach-soft))",
@@ -98,23 +113,59 @@ function ProjectThumbnail({ src, title, large = false }) {
   }
 
   return (
-    <img
-      src={src}
-      alt={`${title} website preview`}
-      onError={() => setImgError(true)}
+    <div
       style={{
+        position: "relative",
         width: "100%",
-        height: large ? "190px" : "120px",
-        objectFit: "cover",
+        height,
         borderRadius: "14px",
+        overflow: "hidden",
         border: "1px solid var(--border-peach)",
+        background: "var(--surface-card)",
       }}
-    />
+    >
+      {!loaded && (
+        <div
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(90deg, var(--bg-peach-soft) 25%, var(--surface-card) 50%, var(--bg-peach-soft) 75%)",
+          }}
+        />
+      )}
+
+      <img
+        src={src}
+        alt={`${title} website preview`}
+        loading="eager"
+        decoding="async"
+        onLoad={() => setLoaded(true)}
+        onError={() => setImgError(true)}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          display: "block",
+          opacity: loaded ? 1 : 0,
+          transition: "opacity 0.2s ease",
+        }}
+      />
+    </div>
   );
 }
 
 function ProjectsView() {
   const [selectedProject, setSelectedProject] = useState(null);
+
+  useEffect(() => {
+    PROJECTS.forEach((project) => {
+      const img = new Image();
+      img.decoding = "async";
+      img.src = project.image;
+    });
+  }, []);
 
   if (selectedProject) {
     return (
@@ -306,14 +357,10 @@ function ProjectsView() {
                   fontSize: "0.83rem",
                   lineHeight: 1.5,
                   color: "var(--text-muted)",
-                  display: "-webkit-box",
-                  WebkitLineClamp: 3,
-                  WebkitBoxOrient: "vertical",
-                  overflow: "hidden",
                   marginBottom: "0.75rem",
                 }}
               >
-                {project.description}
+                {project.summary}
               </p>
             </div>
 
@@ -336,6 +383,7 @@ function ProjectsView() {
                       borderRadius: "999px",
                       background: "var(--surface-card)",
                       border: "1px solid var(--border-peach)",
+                      color: "var(--text-ink)",
                     }}
                   >
                     {tech}

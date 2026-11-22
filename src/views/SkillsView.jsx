@@ -23,14 +23,7 @@ const SKILL_GROUPS = [
   // },
   {
     category: "Backend & Databases",
-    items: [
-      "Python",
-      "Java",
-      "FastAPI",
-      "PostgreSQL",
-      "REST API Integration",
-      "Intuitive User Experiences",
-    ],
+    items: ["Python", "Java", "FastAPI", "PostgreSQL", "REST API Integration"],
   },
   {
     category: "Tools & Motion",

@@ -40,7 +40,7 @@ const SOCIAL_LINKS = [
   {
     id: "github",
     label: "GitHub",
-    href: "https://github.com/your-username",
+    href: "https://github.com/tehrim4",
     icon: GithubIcon,
     external: true,
     lightColor: "#181717",
@@ -49,7 +49,7 @@ const SOCIAL_LINKS = [
   {
     id: "linkedin",
     label: "LinkedIn",
-    href: "https://linkedin.com/in/your-username",
+    href: "https://linkedin.com/in/tehrim4",
     icon: LinkedinIcon,
     external: true,
     lightColor: "#0A66C2",
@@ -58,7 +58,7 @@ const SOCIAL_LINKS = [
   {
     id: "email",
     label: "Email Me",
-    href: "mailto:your.email@example.com",
+    href: "mailto:your.at@tsoftdevelper.com",
     icon: Mail,
     external: false,
     lightColor: "#EA4335",
@@ -67,7 +67,7 @@ const SOCIAL_LINKS = [
   {
     id: "contact",
     label: "Approach / Call",
-    href: "tel:+910000000000",
+    href: "tel:+918976386044",
     icon: PhoneCall,
     external: false,
     lightColor: "#16A34A",

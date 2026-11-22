@@ -5,21 +5,20 @@ import "./VantaBackground.css";
 
 const THEME_CONFIG = {
   light: {
-    backgroundColor: 0xf9dad8, // Misty Rose[cite: 2]
-    color: 0xc65c6a, // Old Rose[cite: 2]
-    points: 9.0,
-    maxDistance: 21.0,
-    spacing: 17.0,
+    backgroundColor: 0xf9dad8, // Misty Rose
+    color: 0xb04856, // Slightly richer rose for clear 3D net depth
+    points: 10.0,
+    maxDistance: 22.0,
+    spacing: 16.5,
   },
   dark: {
-    backgroundColor: 0xc65c6a, // Old Rose[cite: 2]
-    color: 0xf9dad8, // Misty Rose[cite: 2]
+    backgroundColor: 0xc65c6a, // Old Rose
+    color: 0xf9dad8, // Misty Rose
     points: 9.0,
     maxDistance: 21.0,
     spacing: 17.0,
   },
 };
-
 function VantaBackground({ theme = "light" }) {
   const bgRef = useRef(null);
 
