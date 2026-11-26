@@ -104,12 +104,14 @@
 
 .btn-secondary {
   border: 1px solid var(--border-peach);
-  background: var(--bg-peach-soft);
+  background: var(--surface-card);
   color: var(--text-ink);
+  box-shadow: var(--pill-shadow);
 }
 
 .btn-secondary:hover {
   transform: translateY(-2px);
+  box-shadow: var(--pill-pressed);
 }
 
 /* Interactive Mascot Stage */
@@ -127,11 +129,13 @@
   padding: 0.42rem 0.85rem;
   border-radius: 999px;
   background: var(--surface-card);
+  backdrop-filter: var(--surface-blur);
+  -webkit-backdrop-filter: var(--surface-blur);
   border: 1px solid var(--border-peach);
   color: var(--text-ink);
   font-size: 0.78rem;
   font-weight: 700;
-  box-shadow: 0 8px 18px rgba(56, 24, 29, 0.12);
+  box-shadow: var(--pill-shadow);
   margin-bottom: 0.45rem;
   white-space: nowrap;
   animation: bubblePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.45s both;

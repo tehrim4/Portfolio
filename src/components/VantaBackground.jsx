@@ -19,6 +19,7 @@ const THEME_CONFIG = {
     spacing: 17.0,
   },
 };
+
 function VantaBackground({ theme = "light" }) {
   const bgRef = useRef(null);
 
@@ -31,18 +32,24 @@ function VantaBackground({ theme = "light" }) {
 
     const activeConfig = THEME_CONFIG[theme] || THEME_CONFIG.light;
 
-    const vantaEffect = NetEffect({
-      el: bgRef.current,
-      THREE,
-      mouseControls: true,
-      touchControls: true,
-      gyroControls: false,
-      minHeight: 200.0,
-      minWidth: 200.0,
-      scale: 1.0,
-      scaleMobile: 1.0,
-      ...activeConfig,
-    });
+    let vantaEffect = null;
+
+    try {
+      vantaEffect = NetEffect({
+        el: bgRef.current,
+        THREE,
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200.0,
+        minWidth: 200.0,
+        scale: 1.0,
+        scaleMobile: 1.0,
+        ...activeConfig,
+      });
+    } catch (err) {
+      console.warn("Vanta WebGL fallback:", err);
+    }
 
     return () => {
       if (vantaEffect && typeof vantaEffect.destroy === "function") {

@@ -1,171 +1,190 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Volume2, ArrowRight, RotateCcw } from "lucide-react";
 import "./GreetingView.css";
 
-function getTimeGreeting(hour = new Date().getHours()) {
-  if (hour >= 5 && hour < 12) return "Good morning!";
-  if (hour >= 12 && hour < 17) return "Good afternoon!";
-  if (hour >= 17 && hour <= 23) return "Good evening!";
-  return "Welcome!";
+const PREFERRED_FEMALE_VOICES = [
+  "google uk english female",
+  "google us english",
+  "microsoft zira",
+  "microsoft aria",
+  "microsoft jenny",
+  "samantha",
+  "victoria",
+  "karen",
+  "moira",
+  "tessa",
+  "fiona",
+  "female",
+  "woman",
+];
+
+function pickFemaleVoice() {
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+    return null;
+  }
+
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices.length) return null;
+
+  for (const preferred of PREFERRED_FEMALE_VOICES) {
+    const match = voices.find(
+      (v) =>
+        v.lang.toLowerCase().startsWith("en") &&
+        v.name.toLowerCase().includes(preferred),
+    );
+    if (match) return match;
+  }
+
+  return voices.find((v) => v.lang.toLowerCase().startsWith("en")) || voices[0];
 }
 
-function GreetingView({ onEnterPortfolio }) {
-  const fullMessage = `${getTimeGreeting()} I am Tehrim Ansari. Welcome to my website!`;
+function getFullMessage() {
+  const hour = new Date().getHours();
+  let timeGreeting = "Good evening";
+  if (hour < 12) {
+    timeGreeting = "Good morning";
+  } else if (hour < 18) {
+    timeGreeting = "Good afternoon";
+  }
+  return `${timeGreeting}! I am Tehrim Ansari. Welcome to my website!`;
+}
 
+function GreetingStage({ onEnterPortfolio, onReplay }) {
   const [bubbleVisible, setBubbleVisible] = useState(false);
   const [typedText, setTypedText] = useState("");
-  const [typingDone, setTypingDone] = useState(false);
-  const [replayKey, setReplayKey] = useState(0);
+  const [controlsVisible, setControlsVisible] = useState(false);
 
-  const typeIntervalRef = useRef(null);
-  const doneTimeoutRef = useRef(null);
-
-  const stopSpeech = useCallback(() => {
-    if (typeof window !== "undefined" && "speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-    }
+  // Preload browser speech voices (Chrome loads them asynchronously)
+  useEffect(() => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    window.speechSynthesis.getVoices();
+    const handleVoicesChanged = () => window.speechSynthesis.getVoices();
+    window.speechSynthesis.addEventListener(
+      "voiceschanged",
+      handleVoicesChanged,
+    );
+    return () => {
+      window.speechSynthesis.removeEventListener(
+        "voiceschanged",
+        handleVoicesChanged,
+      );
+    };
   }, []);
-
-  const clearTimers = useCallback(() => {
-    if (typeIntervalRef.current) {
-      clearInterval(typeIntervalRef.current);
-      typeIntervalRef.current = null;
-    }
-    if (doneTimeoutRef.current) {
-      clearTimeout(doneTimeoutRef.current);
-      doneTimeoutRef.current = null;
-    }
-  }, []);
-
-  const finishTypingNow = useCallback(() => {
-    clearTimers();
-    setBubbleVisible(true);
-    setTypedText(fullMessage);
-    setTypingDone(true);
-  }, [clearTimers, fullMessage]);
 
   const speakGreeting = useCallback(() => {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-    stopSpeech();
-    const utterance = new SpeechSynthesisUtterance(fullMessage);
-    utterance.rate = 1.02;
-    utterance.pitch = 1.1;
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(getFullMessage());
+    const femaleVoice = pickFemaleVoice();
+    if (femaleVoice) {
+      utterance.voice = femaleVoice;
+    }
+
+    utterance.rate = 0.98;
+    utterance.pitch = 1.18;
     window.speechSynthesis.speak(utterance);
-  }, [fullMessage, stopSpeech]);
-
-  const handleEnter = useCallback(() => {
-    clearTimers();
-    stopSpeech();
-    onEnterPortfolio?.();
-  }, [clearTimers, stopSpeech, onEnterPortfolio]);
-
-  const handleReplay = useCallback(() => {
-    clearTimers();
-    stopSpeech();
-    setReplayKey((prev) => prev + 1);
-  }, [clearTimers, stopSpeech]);
+  }, []);
 
   useEffect(() => {
-    setBubbleVisible(false);
-    setTypedText("");
-    setTypingDone(false);
+    const fullMessage = getFullMessage();
+    let typeInterval;
+    let controlsTimeout;
 
     const startTimeout = setTimeout(() => {
       setBubbleVisible(true);
+      speakGreeting();
 
       let index = 0;
-      typeIntervalRef.current = setInterval(() => {
+      typeInterval = setInterval(() => {
         index += 1;
         setTypedText(fullMessage.slice(0, index));
 
         if (index >= fullMessage.length) {
-          clearInterval(typeIntervalRef.current);
-          typeIntervalRef.current = null;
-          doneTimeoutRef.current = setTimeout(() => {
-            setTypingDone(true);
-          }, 180);
+          clearInterval(typeInterval);
+          controlsTimeout = setTimeout(() => {
+            setControlsVisible(true);
+          }, 300);
         }
-      }, 20);
-    }, 450);
+      }, 36);
+    }, 1450);
 
     return () => {
       clearTimeout(startTimeout);
-      clearTimers();
-      stopSpeech();
+      if (typeInterval) clearInterval(typeInterval);
+      if (controlsTimeout) clearTimeout(controlsTimeout);
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
     };
-  }, [fullMessage, replayKey, clearTimers, stopSpeech]);
+  }, [speakGreeting]);
+
+  return (
+    <div className="intro-stage">
+      {/* Speech Bubble */}
+      <div className={`speech-bubble ${bubbleVisible ? "visible" : ""}`}>
+        <p className="greeting-text" aria-live="polite">
+          {typedText}
+          <span className="typing-cursor" aria-hidden="true">
+            |
+          </span>
+        </p>
+      </div>
+
+      {/* Robot Entering from Left Side */}
+      <div className="robot-wrapper">
+        <img
+          src="/Waving-robot.png"
+          alt="Tehrim Ansari Robot Mascot"
+          className="robot-img"
+        />
+      </div>
+
+      {/* Action Buttons (Hidden until typing completes) */}
+      <div className={`intro-controls ${controlsVisible ? "visible" : ""}`}>
+        <button
+          type="button"
+          className="enter-home-btn"
+          onClick={onEnterPortfolio}
+        >
+          <span>Go to Home Page</span>
+          <ArrowRight size={18} />
+        </button>
+
+        <button
+          type="button"
+          className="intro-icon-btn"
+          onClick={speakGreeting}
+          title="Listen to greeting"
+          aria-label="Listen to greeting"
+        >
+          <Volume2 size={19} />
+        </button>
+
+        <button
+          type="button"
+          className="intro-icon-btn"
+          onClick={onReplay}
+          title="Replay greeting"
+          aria-label="Replay greeting"
+        >
+          <RotateCcw size={18} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function GreetingView({ onEnterPortfolio }) {
+  const [replayKey, setReplayKey] = useState(0);
 
   return (
     <section className="greeting-intro-overlay" aria-label="Welcome Greeting">
-      <div className="intro-stage" key={replayKey}>
-        {/* Speech Bubble (click to show full greeting immediately) */}
-        <div
-          className={`speech-bubble ${bubbleVisible ? "visible" : ""}`}
-          onClick={finishTypingNow}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              finishTypingNow();
-            }
-          }}
-          title="Click to complete message"
-        >
-          <p className="greeting-text" aria-live="polite">
-            {typedText}
-            {!typingDone && (
-              <span className="typing-cursor" aria-hidden="true">
-                |
-              </span>
-            )}
-          </p>
-        </div>
-
-        {/* Robot Entering from Left Side */}
-        <div className="robot-wrapper">
-          <img
-            src="/Waving-robot.png"
-            alt="Tehrim Ansari Robot Mascot"
-            className="robot-img"
-            decoding="async"
-          />
-        </div>
-
-        {/* Action Buttons */}
-        <div
-          className={`intro-controls ${typingDone ? "visible is-ready" : ""}`}
-        >
-          <button
-            type="button"
-            className="enter-home-btn"
-            onClick={handleEnter}
-          >
-            <span>Go to Home Page</span>
-            <ArrowRight size={18} />
-          </button>
-
-          <button
-            type="button"
-            className="intro-icon-btn"
-            onClick={speakGreeting}
-            title="Listen to greeting"
-            aria-label="Listen to greeting"
-          >
-            <Volume2 size={19} />
-          </button>
-
-          <button
-            type="button"
-            className="intro-icon-btn"
-            onClick={handleReplay}
-            title="Replay greeting"
-            aria-label="Replay greeting"
-          >
-            <RotateCcw size={18} />
-          </button>
-        </div>
-      </div>
+      <GreetingStage
+        key={replayKey}
+        onEnterPortfolio={onEnterPortfolio}
+        onReplay={() => setReplayKey((prev) => prev + 1)}
+      />
     </section>
   );
 }
